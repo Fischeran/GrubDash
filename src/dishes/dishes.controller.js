@@ -1,10 +1,10 @@
-const path = require("path");
+const path = require("path")
 
 // Use the existing dishes data
-const dishes = require(path.resolve("src/data/dishes-data"));
+const dishes = require(path.resolve("src/data/dishes-data"))
 
 // Use this function to assign ID's when necessary
-const nextId = require("../utils/nextId");
+const nextId = require("../utils/nextId")
 
 // TODO: Implement the /dishes handlers needed to make the tests pass
 function list(req, res){
@@ -13,7 +13,7 @@ function list(req, res){
 
 function hasValidBody(bodyType) {
     return function (req, res, next) {
-        const { data = {} } = req.body;
+        const { data = {} } = req.body
         if (data[bodyType]) {
             return next()
         } 
@@ -24,7 +24,7 @@ function hasValidBody(bodyType) {
 
 function empty(bodyType) {
     return function (req, res, next) {
-        const { data = {} } = req.body;
+        const { data = {} } = req.body
         if (data[bodyType].toString().length > 0) {
             return next()
         } 
@@ -47,19 +47,19 @@ function create(req, res, next) {
 
  if (price < 0) {return next({ status: 400, message: `price ${price} must be greater than 0`})}
 
- dishes.push(newDish);
+ dishes.push(newDish)
  res.status(201).json({ data: newDish })
 }
 
 function read(req, res) {
-    const { dishId } = req.params;
+    const { dishId } = req.params
     const found = dishes.find(dish => dish.id === dishId)
     res.json({ data: found })
 }
 
 function validId(req, res, next) {
-    const { dishId } = req.params;
-    const exists = dishes.some(dish => dish.id === dishId);
+    const { dishId } = req.params
+    const exists = dishes.some(dish => dish.id === dishId)
     if (exists) {
        next()
     } else {
@@ -68,17 +68,17 @@ function validId(req, res, next) {
 }
 
 function update(req, res, next) {
-    const { dishId } = req.params;
-    const { data: { id , name, description, price, image_url } = {} } = req.body;
-    const found = dishes.find(dish => dish.id === dishId);
+    const { dishId } = req.params
+    const { data: { id , name, description, price, image_url } = {} } = req.body
+    const found = dishes.find(dish => dish.id === dishId)
   
-    if (price < 0 || typeof(price) !== "number") {return next({ status: 400, message: `price ${price} must be greater than 0`})};
+    if (price < 0 || typeof(price) !== "number") {return next({ status: 400, message: `price ${price} must be greater than 0`})}
    if (id) {if (id !== dishId) { return next({ status: 400, message: `id's ${id} must match`})}}
 
-    found.name = name;
-    found.description = description;
-    found.price = price;
-    found.image_url = image_url;
+    found.name = name
+    found.description = description
+    found.price = price
+    found.image_url = image_url
 
     res.json({ data: found })
 

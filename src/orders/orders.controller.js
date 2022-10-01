@@ -1,10 +1,10 @@
-const path = require("path");
+const path = require("path")
 
 // Use the existing order data
-const orders = require(path.resolve("src/data/orders-data"));
+const orders = require(path.resolve("src/data/orders-data"))
 
 // Use this function to assigh ID's when necessary
-const nextId = require("../utils/nextId");
+const nextId = require("../utils/nextId")
 
 // TODO: Implement the /orders handlers needed to make the tests pass
 function list(req, res){
@@ -13,7 +13,7 @@ function list(req, res){
 
 function hasValidBody(bodyType) {
     return function (req, res, next) {
-        const { data = {} } = req.body;
+        const { data = {} } = req.body
         if (data[bodyType]) {
             return next()
         } 
@@ -24,7 +24,7 @@ function hasValidBody(bodyType) {
 
 function empty(bodyType) {
     return function (req, res, next) {
-        const { data = {} } = req.body;
+        const { data = {} } = req.body
 
         if (bodyType === "dishes") {
             if (bodyType.length === 0) {next({ status: 400, message: `${bodyType} must not be empty ${data[bodyType]}`})} else if (Array.isArray(data[bodyType]) === false) {
@@ -43,16 +43,16 @@ function empty(bodyType) {
 
 
 function read(req, res) {
-    const { orderId } = req.params;
-    const found = orders.find(order => order.id === orderId);
+    const { orderId } = req.params
+    const found = orders.find(order => order.id === orderId)
 
     res.json({ data: found })
 }
 
 
 function validateOrder(req, res, next) {
-    const { orderId } = req.params;
-    const exists = orders.some(order => order.id === orderId);
+    const { orderId } = req.params
+    const exists = orders.some(order => order.id === orderId)
 
     if (exists) {
         next()
@@ -63,49 +63,49 @@ function validateOrder(req, res, next) {
 }
 
 function validateDishQuantity(req,res,next) {
-    const { data: { dishes } } = req.body;
+    const { data: { dishes } } = req.body
     const check = dishes.every(dish => dish.quantity)
     check ? next() : next({status: 400, message: `${dishes[0].quantity} all dishes must have quantity`})
 }
 
 function validateDishQuantityZero(req, res, next) {
-    const { data: { dishes } } = req.body;
-    const check = dishes.some(dish => dish.quantity === 0);
+    const { data: { dishes } } = req.body
+    const check = dishes.some(dish => dish.quantity === 0)
     check ? next({status: 400, message: `${dishes[0].quantity} must have quantity`}) : next()
 }
 
 function validateInteger(req, res, next) {
-    const { data: { dishes } } = req.body;
+    const { data: { dishes } } = req.body
     const check = dishes.every(dish => Number. isInteger(dish.quantity))
     check ? next() : next({status: 400, message: `${dishes[1].quantity} all dishes must have quantity`})
 }
 
 function update(req, res, next) {
-    const { orderId } = req.params;
-    const { data: { id , deliverTo, mobileNumber, status, dishes } = {} } = req.body;
+    const { orderId } = req.params
+    const { data: { id , deliverTo, mobileNumber, status, dishes } = {} } = req.body
     
-    const found = orders.find(order => order.id === orderId);
+    const found = orders.find(order => order.id === orderId)
 
     if (id) {if (id !== orderId) { return next({ status: 400, message: `id: ${id}, Route: ${orderId}`})}}
 
-    found.deliverTo = deliverTo;
-    found.mobileNumber = mobileNumber;
-    found.status = status;
-    found.dishes = dishes;
+    found.deliverTo = deliverTo
+    found.mobileNumber = mobileNumber
+    found.status = status
+    found.dishes = dishes
 
     res.json({ data: found })
 
 } 
 
 function isDelivered(req, res, next) {
-    const { data: { status } = {} } = req.body;
+    const { data: { status } = {} } = req.body
 
     if (status === "pending") {return next()} else if (status === "out-for-delivery") {return next()} else if (status === "preparing") {return next()} else if (status === "delivered") {
         return next()} else {return next({ status: 400, message: `status ${status} is inavalid`})}
 
 }
 
-let lastOrderId = orders.reduce((maxId, order) => Math.max(maxId, order.id), 0);
+let lastOrderId = orders.reduce((maxId, order) => Math.max(maxId, order.id), 0)
 
 function create(req, res, next) {
     const { data: { deliverTo, mobileNumber, dishes} = {}} = req.body
@@ -118,20 +118,20 @@ function create(req, res, next) {
         dishes
     }
 
-    orders.push(newOrder);
+    orders.push(newOrder)
 
     res.status(201).json({ data: newOrder })
 
 }
 
 function destroy(req, res, next) {
-    const { orderId } =  req.params;
-    const found = orders.find(order => order.id === orderId);
-    const index = orders.findIndex(order => order.id === orderId);
+    const { orderId } =  req.params
+    const found = orders.find(order => order.id === orderId)
+    const index = orders.findIndex(order => order.id === orderId)
 
     if (found.status !== "pending") {return next({ status: 400, message: `An order cannot be deleted unless it is pending`})} else {
-        orders.splice(index, 1);
-        res.sendStatus(204);
+        orders.splice(index, 1)
+        res.sendStatus(204)
     }
 }
 
